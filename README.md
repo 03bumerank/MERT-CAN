@@ -1,27 +1,32 @@
-# Deploy FastAPI on Render
+# Origins License Server
 
-Use this repo as a template to deploy a Python [FastAPI](https://fastapi.tiangolo.com) service on Render.
+Origins Bot için online lisans API'si.
 
-See https://render.com/docs/deploy-fastapi or follow the steps below:
+## Render kurulumu
 
-## Manual Steps
+1. Bu klasördeki `main.py`, `requirements.txt` ve `render.yaml` dosyalarını GitHub deponuzun KÖK dizinine yükleyin.
+2. Render Dashboard > New > Blueprint seçin.
+3. GitHub deponuzu bağlayın.
+4. Render `render.yaml` dosyasını okuyacaktır.
+5. `ADMIN_KEY` istendiğinde uzun ve rastgele bir parola girin. Bunu GitHub'a yazmayın.
+6. Deploy Blueprint deyin.
+7. Kurulum tamamlandığında servis adresiniz örneğin:
+   `https://origins-license-api.onrender.com`
+   biçiminde olur.
 
-1. You may use this repository directly or [create your own repository from this template](https://github.com/render-examples/fastapi/generate) if you'd like to customize the code.
-2. Create a new Web Service on Render.
-3. Specify the URL to your new repository or this repository.
-4. Render will automatically detect that you are deploying a Python service and use `pip` to download the dependencies.
-5. Specify the following as the Start Command.
+## Test
 
-    ```shell
-    uvicorn main:app --host 0.0.0.0 --port $PORT
-    ```
+Tarayıcıda servis adresinizi açtığınızda:
+`{"ok":true,"service":"Origins License Server"}`
 
-6. Click Create Web Service.
+görmelisiniz.
 
-Or simply click:
+API belgeleri:
+`SERVIS_ADRESI/docs`
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/render-examples/fastapi)
+## Güvenlik
 
-## Thanks
-
-Thanks to [Harish](https://harishgarg.com) for the [inspiration to create a FastAPI quickstart for Render](https://twitter.com/harishkgarg/status/1435084018677010434) and for some sample code!
+- `ADMIN_KEY` kesinlikle GitHub'a yüklenmemelidir.
+- Müşteri uygulamasına `ADMIN_KEY` konulmamalıdır.
+- Müşteri uygulaması yalnızca `/verify` endpoint'ini kullanacaktır.
+- Yönetim endpoint'leri `X-Admin-Key` header'ı ister.
