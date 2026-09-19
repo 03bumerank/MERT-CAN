@@ -226,3 +226,57 @@ def reset_device(data: LicenseRequest, x_admin_key: str | None = Header(default=
             raise HTTPException(status_code=404, detail="Lisans bulunamadı.")
 
     return {"ok": True}
+
+
+@app.get("/public/status")
+def public_license_status(license_key: str):
+    license_key = license_key.strip().upper()
+
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT license_key, expires_at, active, device_id
+                FROM licenses
+                WHERE license_key = %s
+                """,
+                (license_key,),
+            )
+            row = cur.fetchone()
+
+    if not row:
+        return {
+            "valid": False,
+            "message": "Lisans kodu bulunamadı.",
+            "days_left": 0,
+            "device_bound": False,
+        }
+
+    _, expires_at, active, device_id = row
+    now = datetime.now(timezone.utc)
+
+    if not active:
+        return {
+            "valid": False,
+            "message": "Lisans pasif durumda.",
+            "days_left": 0,
+            "device_bound": bool(device_id),
+        }
+
+    if expires_at <= now:
+        return {
+            "valid": False,
+            "message": "Lisans süresi dolmuş.",
+            "days_left": 0,
+            "device_bound": bool(device_id),
+        }
+
+    seconds = max(0, int((expires_at - now).total_seconds()))
+    days_left = (seconds + 86399) // 86400
+
+    return {
+        "valid": True,
+        "message": "Lisans aktif.",
+        "days_left": days_left,
+        "device_bound": bool(device_id),
+    }
